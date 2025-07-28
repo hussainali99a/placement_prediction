@@ -1,0 +1,169 @@
+<!-- templates/index.html (Final Enhanced Version) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Placement Predictor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 550px;
+            text-align: center;
+        }
+        h1 {
+            color: #4a4a4a;
+            margin-bottom: 20px;
+        }
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-group {
+            text-align: left;
+        }
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            grid-column: 1 / -1;
+            padding: 15px;
+            background-color: #5c67f2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #4a54c9;
+        }
+        .result-container {
+            margin-top: 30px;
+            text-align: left;
+        }
+        .prediction {
+            padding: 20px;
+            border-radius: 5px;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+        }
+        .prediction.placed {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .prediction.not-placed {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .confidence {
+            font-size: 0.9em;
+            font-style: italic;
+            font-weight: normal;
+            color: #666;
+            margin-top: 10px;
+        }
+        .suggestions {
+            margin-top: 20px;
+            padding: 0;
+            list-style-type: none;
+        }
+        .suggestions h3 {
+            margin-bottom: 10px;
+            color: #4a4a4a;
+        }
+        .suggestions li {
+            background: #f9f9f9;
+            border-left: 5px solid #5c67f2;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 0 5px 5px 0;
+        }
+        .suggestions.placed-suggestions li {
+            border-left-color: #4CAF50;
+        }
+        .suggestions.not-placed-suggestions li {
+            border-left-color: #FF5722;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Placement Predictor</h1>
+        <form action="{{ url_for('predict') }}" method="post">
+            <div class="form-group">
+                <label for="iq">IQ Score:</label>
+                <input type="number" id="iq" name="iq" placeholder="e.g., 110" required>
+            </div>
+            <div class="form-group">
+                <label for="cgpa">CGPA (out of 10):</label>
+                <input type="number" step="0.01" id="cgpa" name="cgpa" placeholder="e.g., 8.5" required>
+            </div>
+             <div class="form-group">
+                <label for="internship">Internship Experience?</label>
+                <select id="internship" name="internship">
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="projects">Projects Completed:</label>
+                <input type="number" id="projects" name="projects" placeholder="e.g., 3" required>
+            </div>
+            <div class="form-group full-width">
+                <label for="communication">Communication Skills (1-10):</label>
+                <input type="number" id="communication" name="communication" placeholder="e.g., 8" required>
+            </div>
+            <button type="submit">Predict Placement</button>
+        </form>
+
+        {% if prediction_text %}
+            <div class="result-container">
+                <div class="prediction {% if 'LIKELY' in prediction_text %}placed{% else %}not-placed{% endif %}">
+                    <p>{{ prediction_text }}</p>
+                    <p class="confidence">{{ confidence_text }}</p>
+                </div>
+                
+                <ul class="suggestions {% if 'LIKELY' in prediction_text %}placed-suggestions{% else %}not-placed-suggestions{% endif %}">
+                    <h3>Recommendations:</h3>
+                    {% for suggestion in suggestions %}
+                        <li>{{ suggestion }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
